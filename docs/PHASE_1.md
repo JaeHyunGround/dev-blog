@@ -523,12 +523,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 ### Tasks
 
-- [ ] 홈페이지에 최신 포스트 목록
-- [ ] PostCard 컴포넌트
-- [ ] PostList 컴포넌트
-- [ ] 태그별 목록 페이지 (`/tags/[tag]`)
-- [ ] ISR 설정 (revalidate)
-- [ ] 빈 목록 상태 처리
+- [x] 홈페이지에 최신 포스트 목록
+- [x] PostCard 컴포넌트
+- [x] PostList 컴포넌트
+- [x] 태그별 목록 페이지 (`/tags/[tag]`)
+- [x] ISR 설정 (revalidate: 3600)
+- [x] 빈 목록 상태 처리
 
 ### 렌더링 전략
 
@@ -571,10 +571,12 @@ src/app/
 
 ### 완료 기준
 
-- [ ] 홈에서 전체 포스트 목록 표시
-- [ ] PostCard에 제목, 요약, 날짜, 태그 표시
-- [ ] 태그 클릭 시 해당 태그 포스트만 필터링
-- [ ] 포스트 없을 때 적절한 메시지 표시
+- [x] 홈에서 전체 포스트 목록 표시 (3개 포스트)
+- [x] PostCard에 제목, 요약, 날짜, 태그 표시
+- [x] 태그 클릭 시 해당 태그 포스트만 필터링 (8개 태그 페이지 생성)
+- [x] 포스트 없을 때 적절한 메시지 표시
+- [x] generateStaticParams로 태그 페이지 정적 생성
+- [x] ISR (Incremental Static Regeneration) 적용
 
 ---
 
