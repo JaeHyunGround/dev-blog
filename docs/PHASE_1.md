@@ -584,12 +584,12 @@ src/app/
 
 ### Tasks
 
-- [ ] 동적 라우트 설정 (`[slug]`)
-- [ ] MDX 컴포넌트 렌더링
-- [ ] generateStaticParams 설정
-- [ ] generateMetadata 설정 (동적 SEO)
-- [ ] 404 처리 (notFound)
-- [ ] MDX 커스텀 컴포넌트 작성
+- [x] 동적 라우트 설정 (`[slug]`)
+- [x] MDX 컴포넌트 렌더링 (next-mdx-remote/rsc)
+- [x] generateStaticParams 설정
+- [x] generateMetadata 설정 (동적 SEO)
+- [x] 404 처리 (notFound)
+- [x] MDX 커스텀 컴포넌트 작성 (mdx-components.tsx)
 
 ### 코드 구조
 
@@ -686,11 +686,13 @@ export function Callout({
 
 ### 완료 기준
 
-- [ ] MDX 정상 렌더링 (헤딩, 리스트, 링크, 이미지)
-- [ ] 코드블록 구문 강조 동작
-- [ ] 커스텀 컴포넌트 사용 가능
-- [ ] 존재하지 않는 slug 접근 시 404
-- [ ] SEO 메타데이터 동적 생성 확인
+- [x] MDX 정상 렌더링 (헤딩, 리스트, 링크, 이미지)
+- [x] 코드블록 구문 강조 동작 (rehype-highlight)
+- [x] 커스텀 컴포넌트 사용 가능 (mdx-components.tsx)
+- [x] 존재하지 않는 slug 접근 시 404 (notFound)
+- [x] SEO 메타데이터 동적 생성 확인 (OpenGraph, Twitter Card)
+- [x] 3개 포스트 페이지 정적 생성
+- [x] ISR 적용 (revalidate: 3600)
 
 ---
 

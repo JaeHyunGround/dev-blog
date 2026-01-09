@@ -99,3 +99,88 @@ body {
 * {
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
+
+/* Custom prose styles for MDX content */
+.prose {
+  color: var(--foreground);
+}
+
+.prose p,
+.prose li,
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  color: var(--foreground);
+}
+
+.prose a {
+  color: var(--primary);
+}
+
+.prose strong {
+  color: var(--foreground);
+}
+
+.prose code {
+  color: var(--foreground);
+}
+
+.prose table {
+  color: var(--foreground);
+}
+
+.prose thead {
+  border-bottom-color: var(--border);
+}
+
+.prose thead th {
+  color: var(--foreground);
+  background-color: var(--muted);
+}
+
+.prose tbody tr {
+  border-bottom-color: var(--border);
+}
+
+.prose th,
+.prose td {
+  color: var(--foreground);
+}
+
+/* Code block styles with rehype-pretty-code */
+.prose pre {
+  @apply overflow-x-auto rounded-lg p-4 my-6;
+  /* Don't override background - let rehype-pretty-code handle it */
+}
+
+.prose code {
+  @apply font-(family-name:--font-geist-mono) text-sm;
+}
+
+.prose pre code {
+  @apply bg-transparent p-0;
+  display: grid;
+}
+
+/* Inline code - not in pre blocks */
+.prose :not(pre) > code {
+  @apply bg-muted px-1.5 py-0.5 rounded text-sm;
+  color: var(--foreground) !important;
+}
+
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+  content: '';
+}
+
+/* Line highlighting */
+.prose pre [data-line] {
+  @apply px-4;
+}
+
+.prose pre [data-highlighted-line] {
+  background-color: rgba(59, 130, 246, 0.1);
+}

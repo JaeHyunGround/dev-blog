@@ -25,7 +25,8 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: TagPageProps): Promise<Metadata> {
-  const tag = decodeURIComponent(params.tag);
+  const { tag: tagParam } = await params;
+  const tag = decodeURIComponent(tagParam);
 
   return {
     title: `${tag} 태그`,
@@ -34,7 +35,8 @@ export async function generateMetadata({
 }
 
 export default async function TagPage({ params }: TagPageProps) {
-  const tag = decodeURIComponent(params.tag);
+  const { tag: tagParam } = await params;
+  const tag = decodeURIComponent(tagParam);
   const provider = getContentProvider();
 
   // 태그로 포스트 필터링
