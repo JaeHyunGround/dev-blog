@@ -55,12 +55,12 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
       </blockquote>
     ),
     code: ({ children }) => (
-      <code className="bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-sm text-gray-800 dark:text-gray-200 font-mono">
+      <code className="bg-gray-100 dark:bg-gray-800 rounded px-1.5 py-0.5 text-sm text-gray-800 dark:text-gray-200 font-(family-name:--font-geist-mono)">
         {children}
       </code>
     ),
     pre: ({ children }) => (
-      <pre className="bg-gray-900 dark:bg-gray-950 rounded-lg p-4 overflow-x-auto mb-4">
+      <pre className="bg-gray-900 dark:bg-gray-950 rounded-lg p-4 overflow-x-auto mb-4 font-(family-name:--font-geist-mono)">
         {children}
       </pre>
     ),

@@ -398,11 +398,11 @@ console.log("Hello, World!");
 
 ### Tasks
 
-- [ ] 루트 레이아웃 구현
-- [ ] Header 컴포넌트 (로고, 네비게이션)
-- [ ] Footer 컴포넌트
-- [ ] 반응형 네비게이션 (모바일 메뉴)
-- [ ] SEO 기본 메타데이터 설정
+- [x] 루트 레이아웃 구현
+- [x] Header 컴포넌트 (로고, 네비게이션)
+- [x] Footer 컴포넌트
+- [x] 반응형 네비게이션 (모바일 메뉴)
+- [x] SEO 기본 메타데이터 설정
 
 ### 메타데이터
 
@@ -450,9 +450,10 @@ export default function RootLayout({
 
 ### 완료 기준
 
-- [ ] 모든 페이지에 Header/Footer 표시
-- [ ] 모바일에서 햄버거 메뉴 동작
-- [ ] 메타데이터 정상 적용
+- [x] 모든 페이지에 Header/Footer 표시
+- [x] 모바일에서 햄버거 메뉴 동작
+- [x] 메타데이터 정상 적용 (title template, description, OpenGraph, SEO)
+- [x] 개발 서버 실행 및 렌더링 확인
 
 ---
 
@@ -460,12 +461,12 @@ export default function RootLayout({
 
 ### Tasks
 
-- [ ] next-themes 설치
-- [ ] ThemeProvider 설정
-- [ ] Tailwind dark mode 설정 (`darkMode: 'class'`)
-- [ ] ThemeToggle 컴포넌트
-- [ ] 시스템 설정 감지
-- [ ] localStorage 저장/복원
+- [x] next-themes 설치
+- [x] ThemeProvider 설정
+- [x] Tailwind dark mode 설정 (CSS variables with :root.dark)
+- [x] ThemeToggle 컴포넌트
+- [x] 시스템 설정 감지
+- [x] localStorage 저장/복원
 
 ### Dependencies
 
@@ -510,9 +511,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
 ### 완료 기준
 
-- [ ] 토글 버튼으로 테마 전환
-- [ ] 새로고침 후에도 테마 유지
-- [ ] 시스템 설정 변경 시 자동 반영
+- [x] 토글 버튼으로 테마 전환
+- [x] 새로고침 후에도 테마 유지 (localStorage)
+- [x] 시스템 설정 변경 시 자동 반영 (enableSystem)
+- [x] Header에 ThemeToggle 통합
+- [x] Smooth transition 적용
 
 ---
 
