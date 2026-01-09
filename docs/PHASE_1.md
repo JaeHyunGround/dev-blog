@@ -180,10 +180,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
 ### Tasks
 
-- [ ] `Post` 타입 정의
-- [ ] `ContentProvider` 인터페이스 정의
-- [ ] MDXProvider 클래스 기본 구조
-- [ ] 타입 export 설정
+- [x] `Post` 타입 정의
+- [x] `ContentProvider` 인터페이스 정의
+- [x] MDXProvider 클래스 기본 구조
+- [x] 타입 export 설정
 
 ### 파일 구조
 
@@ -228,8 +228,9 @@ export interface ContentProvider {
 
 ### 완료 기준
 
-- [ ] 타입 정의 완료
-- [ ] Provider 기본 구조 작성
+- [x] 타입 정의 완료
+- [x] Provider 기본 구조 작성
+- [x] TypeScript 컴파일 성공
 
 ---
 
