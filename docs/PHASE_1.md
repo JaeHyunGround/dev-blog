@@ -238,13 +238,13 @@ export interface ContentProvider {
 
 ### Tasks
 
-- [ ] 로컬 MDX 파일 읽기 로직
-- [ ] frontmatter 파싱
-- [ ] `getAllPosts()` 구현
-- [ ] `getPostBySlug()` 구현
-- [ ] `getPostsByTag()` 구현
-- [ ] `getAllTags()` 구현
-- [ ] 샘플 포스트 2-3개 작성
+- [x] 로컬 MDX 파일 읽기 로직
+- [x] frontmatter 파싱
+- [x] `getAllPosts()` 구현
+- [x] `getPostBySlug()` 구현
+- [x] `getPostsByTag()` 구현
+- [x] `getAllTags()` 구현
+- [x] 샘플 포스트 3개 작성 (hello-world, nextjs-app-router-guide, typescript-best-practices)
 
 ### MDXProvider 구현
 
@@ -386,10 +386,11 @@ console.log("Hello, World!");
 
 ### 완료 기준
 
-- [ ] `getAllPosts()` 호출 시 포스트 목록 반환
-- [ ] `getPostBySlug('hello-world')` 정상 동작
-- [ ] 존재하지 않는 slug는 `null` 반환
-- [ ] 태그 필터링 정상 동작
+- [x] `getAllPosts()` 호출 시 포스트 목록 반환 (3개 포스트)
+- [x] `getPostBySlug('hello-world')` 정상 동작
+- [x] 존재하지 않는 slug는 `null` 반환
+- [x] 태그 필터링 정상 동작 (`getPostsByTag()`, `getAllTags()`)
+- [x] TypeScript 컴파일 및 빌드 성공
 
 ---
 

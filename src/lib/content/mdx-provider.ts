@@ -14,32 +14,63 @@ export class MDXProvider implements ContentProvider {
    * 모든 포스트를 가져옵니다 (최신순 정렬)
    */
   async getAllPosts(): Promise<Post[]> {
-    // TODO: Phase 1.4에서 구현
-    return [];
+    const fileNames = this.getPostFilePaths();
+    const posts = fileNames
+      .map((fileName) => {
+        try {
+          return this.readPostFile(fileName);
+        } catch (error) {
+          console.error(`Error reading post file ${fileName}:`, error);
+          return null;
+        }
+      })
+      .filter((post): post is Post => post !== null);
+
+    // 최신순 정렬
+    return posts.sort(
+      (a, b) =>
+        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
   }
 
   /**
    * slug로 특정 포스트를 가져옵니다
    */
   async getPostBySlug(slug: string): Promise<Post | null> {
-    // TODO: Phase 1.4에서 구현
-    return null;
+    try {
+      // .mdx 또는 .md 파일 시도
+      const mdxPath = `${slug}.mdx`;
+      const mdPath = `${slug}.md`;
+
+      if (fs.existsSync(path.join(POSTS_DIR, mdxPath))) {
+        return this.readPostFile(mdxPath);
+      } else if (fs.existsSync(path.join(POSTS_DIR, mdPath))) {
+        return this.readPostFile(mdPath);
+      }
+
+      return null;
+    } catch (error) {
+      console.error(`Error reading post ${slug}:`, error);
+      return null;
+    }
   }
 
   /**
    * 특정 태그를 가진 포스트들을 가져옵니다
    */
   async getPostsByTag(tag: string): Promise<Post[]> {
-    // TODO: Phase 1.4에서 구현
-    return [];
+    const posts = await this.getAllPosts();
+    return posts.filter((post) => post.tags.includes(tag));
   }
 
   /**
    * 모든 태그 목록을 가져옵니다
    */
   async getAllTags(): Promise<string[]> {
-    // TODO: Phase 1.4에서 구현
-    return [];
+    const posts = await this.getAllPosts();
+    const tagSet = new Set<string>();
+    posts.forEach((post) => post.tags.forEach((tag) => tagSet.add(tag)));
+    return Array.from(tagSet).sort();
   }
 
   /**

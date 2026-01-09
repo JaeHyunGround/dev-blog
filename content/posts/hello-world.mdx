@@ -1,0 +1,93 @@
+---
+title: "블로그를 시작하며"
+excerpt: "Next.js와 MDX로 만든 개인 블로그를 소개합니다. Content Provider 패턴을 활용한 확장 가능한 아키텍처에 대해 알아봅니다."
+publishedAt: "2025-01-09"
+tags: ["blog", "next.js", "mdx"]
+---
+
+# 블로그를 시작하며
+
+안녕하세요! Next.js 14와 MDX를 활용한 개인 기술 블로그를 시작합니다.
+
+## 프로젝트 소개
+
+이 블로그는 다음과 같은 기술 스택으로 구성되어 있습니다:
+
+- **Next.js 14+** - App Router를 활용한 최신 React 프레임워크
+- **TypeScript** - 타입 안정성을 위한 필수 도구
+- **Tailwind CSS** - 유틸리티 퍼스트 CSS 프레임워크
+- **MDX** - 마크다운에 React 컴포넌트를 사용할 수 있는 포맷
+
+## Content Provider 패턴
+
+이 블로그의 핵심 아키텍처는 **Content Provider Pattern**입니다. 이 패턴을 통해:
+
+1. 다양한 컨텐츠 소스를 추상화할 수 있습니다
+2. MDX에서 Obsidian으로의 마이그레이션이 쉽습니다
+3. 확장 가능한 구조를 유지할 수 있습니다
+
+```typescript
+interface ContentProvider {
+  getAllPosts(): Promise<Post[]>;
+  getPostBySlug(slug: string): Promise<Post | null>;
+  getPostsByTag(tag: string): Promise<Post[]>;
+  getAllTags(): Promise<string[]>;
+}
+```
+
+## 주요 기능
+
+### 마크다운 지원
+
+일반적인 마크다운 문법은 물론, GFM(GitHub Flavored Markdown)도 지원합니다.
+
+**볼드체**, *이탤릭체*, ~~취소선~~ 등의 기본 서식이 가능합니다.
+
+### 코드 하이라이팅
+
+코드 블록에는 자동으로 Syntax Highlighting이 적용됩니다:
+
+```javascript
+function greet(name) {
+  return `Hello, ${name}!`;
+}
+
+console.log(greet("World"));
+```
+
+### 리스트
+
+- 순서 없는 리스트
+- 중첩된 항목
+  - 서브 항목 1
+  - 서브 항목 2
+- 다시 원래 레벨
+
+### 인용구
+
+> 좋은 코드는 그 자체로 최고의 문서다.
+>
+> — Steve McConnell
+
+### 테이블
+
+| 기능 | 지원 여부 | 비고 |
+|------|----------|------|
+| MDX | ✅ | 현재 버전 |
+| Obsidian | 🔜 | Phase 2 |
+| 다크모드 | ✅ | 구현 완료 |
+
+## 앞으로의 계획
+
+Phase별로 단계적인 개발을 진행할 예정입니다:
+
+1. **Phase 1** - MDX 기반 블로그 (현재)
+2. **Phase 2** - Obsidian 연동
+3. **Phase 3** - SEO 최적화
+4. **Phase 4** - UX 개선
+
+## 마치며
+
+이 블로그를 통해 개발하면서 배운 내용들을 꾸준히 기록하고 공유하겠습니다.
+
+감사합니다! 🚀

@@ -1,0 +1,348 @@
+---
+title: "TypeScript 모범 사례 2025"
+excerpt: "실무에서 바로 적용 가능한 TypeScript 모범 사례를 알아봅니다. 타입 안정성을 높이고 유지보수하기 쉬운 코드를 작성하는 방법을 다룹니다."
+publishedAt: "2025-01-07"
+tags: ["typescript", "best-practices", "programming"]
+updatedAt: "2025-01-08"
+---
+
+# TypeScript 모범 사례 2025
+
+TypeScript는 이제 프론트엔드 개발의 표준이 되었습니다. 실무에서 바로 활용할 수 있는 모범 사례를 정리했습니다.
+
+## 1. 타입 정의 원칙
+
+### 명시적 타입 사용
+
+```typescript
+// ❌ Bad
+function add(a, b) {
+  return a + b;
+}
+
+// ✅ Good
+function add(a: number, b: number): number {
+  return a + b;
+}
+```
+
+### Interface vs Type
+
+둘 다 사용 가능하지만, 상황에 맞게 선택하세요:
+
+```typescript
+// Interface: 객체 구조 정의, 확장 가능
+interface User {
+  id: string;
+  name: string;
+}
+
+interface Admin extends User {
+  role: 'admin';
+}
+
+// Type: Union, Intersection, Utility 타입
+type Status = 'pending' | 'success' | 'error';
+type ReadonlyUser = Readonly<User>;
+```
+
+**권장사항:**
+- 공개 API나 라이브러리: `interface` 사용
+- 내부 구현이나 복잡한 타입: `type` 사용
+
+## 2. Utility 타입 활용
+
+### Partial과 Required
+
+```typescript
+interface Post {
+  title: string;
+  content: string;
+  publishedAt: Date;
+}
+
+// 부분 업데이트
+function updatePost(id: string, data: Partial<Post>) {
+  // ...
+}
+
+// 모든 필드 필수
+function createPost(data: Required<Post>) {
+  // ...
+}
+```
+
+### Pick과 Omit
+
+```typescript
+// 특정 필드만 선택
+type PostPreview = Pick<Post, 'title' | 'publishedAt'>;
+
+// 특정 필드 제외
+type PostWithoutContent = Omit<Post, 'content'>;
+```
+
+### Record
+
+```typescript
+// 객체 맵 타입
+type UserRoles = Record<string, 'admin' | 'user' | 'guest'>;
+
+const roles: UserRoles = {
+  'user-1': 'admin',
+  'user-2': 'user',
+};
+```
+
+## 3. 제네릭 활용
+
+### 기본 제네릭
+
+```typescript
+function identity<T>(value: T): T {
+  return value;
+}
+
+const num = identity(42); // number
+const str = identity("hello"); // string
+```
+
+### 제약 조건
+
+```typescript
+interface HasId {
+  id: string;
+}
+
+function findById<T extends HasId>(items: T[], id: string): T | undefined {
+  return items.find(item => item.id === id);
+}
+```
+
+### 다중 제네릭
+
+```typescript
+function merge<T, U>(obj1: T, obj2: U): T & U {
+  return { ...obj1, ...obj2 };
+}
+
+const result = merge(
+  { name: 'John' },
+  { age: 30 }
+); // { name: string; age: number }
+```
+
+## 4. 타입 가드
+
+### typeof 가드
+
+```typescript
+function process(value: string | number) {
+  if (typeof value === 'string') {
+    // value는 string 타입
+    return value.toUpperCase();
+  }
+  // value는 number 타입
+  return value.toFixed(2);
+}
+```
+
+### instanceof 가드
+
+```typescript
+class Dog {
+  bark() { console.log('Woof!'); }
+}
+
+class Cat {
+  meow() { console.log('Meow!'); }
+}
+
+function makeSound(animal: Dog | Cat) {
+  if (animal instanceof Dog) {
+    animal.bark();
+  } else {
+    animal.meow();
+  }
+}
+```
+
+### 커스텀 타입 가드
+
+```typescript
+interface User {
+  type: 'user';
+  name: string;
+}
+
+interface Admin {
+  type: 'admin';
+  name: string;
+  permissions: string[];
+}
+
+function isAdmin(person: User | Admin): person is Admin {
+  return person.type === 'admin';
+}
+
+function greet(person: User | Admin) {
+  if (isAdmin(person)) {
+    console.log(`Admin ${person.name} has ${person.permissions.length} permissions`);
+  } else {
+    console.log(`User ${person.name}`);
+  }
+}
+```
+
+## 5. 불변성 보장
+
+### readonly
+
+```typescript
+interface Config {
+  readonly apiUrl: string;
+  readonly timeout: number;
+}
+
+const config: Config = {
+  apiUrl: 'https://api.example.com',
+  timeout: 5000,
+};
+
+// config.apiUrl = 'new-url'; // ❌ Error
+```
+
+### ReadonlyArray
+
+```typescript
+function sum(numbers: readonly number[]): number {
+  // numbers.push(1); // ❌ Error
+  return numbers.reduce((a, b) => a + b, 0);
+}
+```
+
+### as const
+
+```typescript
+const colors = ['red', 'green', 'blue'] as const;
+type Color = typeof colors[number]; // 'red' | 'green' | 'blue'
+
+const config = {
+  apiUrl: 'https://api.example.com',
+  port: 3000,
+} as const;
+// config.port는 3000 리터럴 타입
+```
+
+## 6. Discriminated Union
+
+```typescript
+type Success = {
+  status: 'success';
+  data: any;
+};
+
+type Error = {
+  status: 'error';
+  error: string;
+};
+
+type Result = Success | Error;
+
+function handleResult(result: Result) {
+  if (result.status === 'success') {
+    console.log(result.data); // ✅ OK
+    // console.log(result.error); // ❌ Error
+  } else {
+    console.log(result.error); // ✅ OK
+    // console.log(result.data); // ❌ Error
+  }
+}
+```
+
+## 7. 타입 추론 활용
+
+### 함수 반환 타입 추론
+
+```typescript
+// 명시적 반환 타입 불필요
+function double(n: number) {
+  return n * 2; // 자동으로 number 추론
+}
+```
+
+### 제네릭 타입 추론
+
+```typescript
+function toArray<T>(value: T): T[] {
+  return [value];
+}
+
+const nums = toArray(1); // number[]
+const strs = toArray('hello'); // string[]
+```
+
+## 8. strict 모드 활성화
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true
+  }
+}
+```
+
+## 9. 타입 좁히기 (Narrowing)
+
+```typescript
+function padLeft(value: string, padding: string | number) {
+  if (typeof padding === 'number') {
+    return ' '.repeat(padding) + value;
+  }
+  return padding + value;
+}
+```
+
+## 10. Never 타입 활용
+
+```typescript
+function assertNever(x: never): never {
+  throw new Error('Unexpected value: ' + x);
+}
+
+type Shape = Circle | Square | Triangle;
+
+function getArea(shape: Shape): number {
+  switch (shape.kind) {
+    case 'circle':
+      return Math.PI * shape.radius ** 2;
+    case 'square':
+      return shape.size ** 2;
+    case 'triangle':
+      return (shape.base * shape.height) / 2;
+    default:
+      return assertNever(shape); // 모든 케이스를 처리했는지 확인
+  }
+}
+```
+
+## 핵심 원칙
+
+1. **타입을 명시적으로 정의하세요**
+2. **any 사용을 최소화하세요**
+3. **strict 모드를 활성화하세요**
+4. **타입 가드를 적극 활용하세요**
+5. **불변성을 보장하세요**
+6. **유틸리티 타입을 활용하세요**
+
+## 마치며
+
+TypeScript는 단순한 타입 체커가 아닌, 코드 품질을 높이는 강력한 도구입니다.
+이러한 모범 사례들을 적용하면 더 안전하고 유지보수하기 쉬운 코드를 작성할 수 있습니다.
