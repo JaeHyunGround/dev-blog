@@ -92,11 +92,11 @@ dev-blog/
 
 ### Tasks
 
-- [ ] @next/mdx, @mdx-js/loader, @mdx-js/react 설치
-- [ ] remark-gfm, rehype-highlight 설치
-- [ ] next.config.js MDX 설정
-- [ ] mdx-components.tsx 생성
-- [ ] TypeScript 설정 (mdx 파일 인식)
+- [x] @next/mdx, @mdx-js/loader, @mdx-js/react 설치
+- [x] remark-gfm, rehype-highlight 설치
+- [x] next.config.ts MDX 설정
+- [x] mdx-components.tsx 생성
+- [x] TypeScript 설정 (mdx 파일 인식)
 
 ### Dependencies
 
@@ -170,8 +170,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
 ### 완료 기준
 
-- [ ] MDX 파일 인식 및 렌더링 확인
-- [ ] 코드 하이라이팅 동작 확인
+- [x] MDX 파일 인식 및 렌더링 확인
+- [x] 코드 하이라이팅 동작 확인
+- [x] 빌드 성공 확인
 
 ---
 
