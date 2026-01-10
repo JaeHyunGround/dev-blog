@@ -1,0 +1,48 @@
+---
+title: "CSS Flexbox vs Grid 비교"
+excerpt: "Flexbox와 Grid의 차이점과 각각의 사용 사례를 알아봅니다."
+publishedAt: "2025-01-07"
+tags: ["CSS", "Flexbox", "Grid"]
+---
+
+# CSS Flexbox vs Grid 비교
+
+레이아웃을 구성하는 두 가지 강력한 CSS 기술을 비교해봅니다.
+
+## Flexbox
+
+1차원 레이아웃에 최적화되어 있습니다.
+
+```css
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+```
+
+**사용 사례:**
+- 네비게이션 바
+- 카드 레이아웃
+- 버튼 그룹
+
+## Grid
+
+2차원 레이아웃에 최적화되어 있습니다.
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+```
+
+**사용 사례:**
+- 전체 페이지 레이아웃
+- 대시보드
+- 갤러리
+
+## 결론
+
+Flexbox는 간단한 1차원 정렬에, Grid는 복잡한 2차원 레이아웃에 사용하세요!

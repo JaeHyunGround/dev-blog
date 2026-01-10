@@ -8,6 +8,7 @@ import remarkGfm from "remark-gfm";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
+import { formatReadingTime } from "@/lib/utils/reading-time";
 
 export const revalidate = 3600; // 1시간마다 재생성
 
@@ -88,20 +89,24 @@ export default async function PostPage({ params }: PostPageProps) {
         </h1>
 
         {/* Meta Info */}
-        <div className="flex flex-wrap items-center gap-4 text-muted-foreground mb-4">
-          <time dateTime={post.publishedAt} className="text-sm">
+        <div className="flex flex-wrap items-center gap-3 text-muted-foreground mb-4 text-sm">
+          <time dateTime={post.publishedAt}>
             {formattedDate}
           </time>
+          <span>·</span>
+          <span>{formatReadingTime(post.readingTime)}</span>
           {post.updatedAt && post.updatedAt !== post.publishedAt && (
-            <span className="text-sm">
-              (최종 수정:{" "}
-              {new Date(post.updatedAt).toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
-              )
-            </span>
+            <>
+              <span>·</span>
+              <span>
+                최종 수정:{" "}
+                {new Date(post.updatedAt).toLocaleDateString("ko-KR", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                })}
+              </span>
+            </>
           )}
         </div>
 

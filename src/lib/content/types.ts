@@ -16,6 +16,7 @@ export interface PostFrontmatter {
 export interface Post extends PostFrontmatter {
   slug: string;
   content: string; // MDX/Markdown raw source
+  readingTime: number; // 읽기 시간 (분)
 }
 
 /**

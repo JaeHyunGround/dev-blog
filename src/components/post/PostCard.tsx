@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { Post } from '@/lib/content/types';
+import { formatReadingTime } from '@/lib/utils/reading-time';
 
 interface PostCardProps {
   post: Post;
@@ -26,13 +27,14 @@ export function PostCard({ post }: PostCardProps) {
 
       {/* Meta Info */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        {/* Date */}
-        <time
-          dateTime={post.publishedAt}
-          className="text-sm text-muted-foreground"
-        >
-          {formattedDate}
-        </time>
+        {/* Date & Reading Time */}
+        <div className="flex items-center gap-3 text-sm text-muted-foreground">
+          <time dateTime={post.publishedAt}>
+            {formattedDate}
+          </time>
+          <span>·</span>
+          <span>{formatReadingTime(post.readingTime)}</span>
+        </div>
 
         {/* Tags */}
         {post.tags.length > 0 && (

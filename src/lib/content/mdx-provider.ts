@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { Post, PostFrontmatter, ContentProvider } from "./types";
+import { calculateReadingTime } from "../utils/reading-time";
 
 const POSTS_DIR = path.join(process.cwd(), "content/posts");
 
@@ -100,10 +101,12 @@ export class MDXProvider implements ContentProvider {
 
     const slug = this.getSlugFromFilename(filename);
     const frontmatter = data as PostFrontmatter;
+    const readingTime = calculateReadingTime(content);
 
     return {
       slug,
       content,
+      readingTime,
       ...frontmatter,
     };
   }
