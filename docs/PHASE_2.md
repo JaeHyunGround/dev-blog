@@ -1,228 +1,238 @@
-# Phase 2: Obsidian CMS 마이그레이션
+# Phase 2: Notion CMS 마이그레이션
 
-> 목표: MDX에서 Obsidian으로 컨텐츠 관리 방식 전환
+> 목표: MDX에서 Notion으로 컨텐츠 관리 방식 전환
 
 ---
 
 ## 개요
 
-**Phase 1**에서 구축한 MDX 기반 블로그를 **Obsidian CMS**로 전환합니다.
+**Phase 1**에서 구축한 MDX 기반 블로그를 **Notion CMS**로 전환합니다.
 
 **마이그레이션 목표**:
 
-- Obsidian의 강력한 마크다운 에디팅 기능 활용
-- 위키링크, 백링크, 그래프 뷰 등 Obsidian 고유 기능 사용
-- 마크다운 문법으로 작성 (MDX 컴포넌트 제거)
-- Git 기반 워크플로우 유지
+- Notion의 강력한 에디팅 기능 활용
+- 웹 기반 컨텐츠 관리 (어디서나 작성 가능)
+- Notion Database를 컨텐츠 소스로 활용
+- 자동 동기화 및 빌드 트리거
+- Git 커밋 없이 포스트 발행
 
 **기술 변경사항**:
 
-- MDX → Markdown (.md)
-- MDXProvider → ObsidianProvider
-- 위키링크 변환 로직 추가
-- 이미지 경로 처리 개선
+- MDX → Notion Database
+- MDXProvider → NotionProvider
+- Notion API 연동
+- Notion blocks → Markdown 변환
+- ISR (Incremental Static Regeneration) 활용
 
 ---
 
-## 2.1 Obsidian Vault 설정
+## 2.1 Notion 설정
 
 ### Tasks
 
-- [ ] `content/` 폴더를 Obsidian vault로 설정
-- [ ] Obsidian 설정 조정
-  - Default location for new attachments → `attachments/`
-  - New link format → "Shortest path when possible"
-  - Automatically update internal links → ON
-- [ ] Paste Image Rename 플러그인 설치
-- [ ] Templater 플러그인 설치 (포스트 템플릿)
-- [ ] `.gitignore` 업데이트 (`.obsidian/workspace` 제외)
+- [ ] Notion 워크스페이스 생성 또는 기존 사용
+- [ ] Blog Posts 데이터베이스 생성
+- [ ] 데이터베이스 속성 설정
+- [ ] Notion Integration 생성
+- [ ] Integration을 데이터베이스에 연결
+- [ ] 환경변수 설정
 
-### Obsidian 설정
+### Notion Database 속성
 
-**Files & Links**:
+블로그 포스트를 관리할 데이터베이스 속성:
 
+| 속성명         | 타입        | 설명                           | 필수 |
+| -------------- | ----------- | ------------------------------ | ---- |
+| Title          | Title       | 포스트 제목                    | ✅   |
+| Slug           | Text        | URL slug (예: hello-world)     | ✅   |
+| Excerpt        | Text        | 포스트 요약                    | ✅   |
+| Published      | Checkbox    | 발행 상태                      | ✅   |
+| PublishedAt    | Date        | 발행일                         | ✅   |
+| UpdatedAt      | Last edited | 마지막 수정일 (자동)           | ❌   |
+| Tags           | Multi-select| 태그 목록                      | ❌   |
+| Thumbnail      | Files       | 썸네일 이미지                  | ❌   |
+| Views          | Number      | 조회수 (선택)                  | ❌   |
+
+### Notion Integration 생성
+
+1. [Notion Integrations](https://www.notion.so/my-integrations) 접속
+2. "New integration" 클릭
+3. 설정:
+   - Name: `Dev Blog`
+   - Associated workspace: 본인 워크스페이스 선택
+   - Type: Internal
+   - Capabilities:
+     - ✅ Read content (필수)
+     - ✅ Update content (향후 CRUD 기능 사용 시)
+     - ✅ Insert content (향후 CRUD 기능 사용 시)
+4. "Submit" 클릭
+5. **Integration Token** 복사 (나중에 사용)
+
+**보안 주의사항**:
+- Integration Token은 절대 Git에 커밋하지 말 것
+- `.env.local` 파일을 `.gitignore`에 추가
+- Vercel 등 배포 환경에서는 Environment Variables로 설정
+
+### Integration 연결
+
+1. Notion에서 Blog Posts 데이터베이스 페이지 열기
+2. 우측 상단 `···` 메뉴 → `Add connections`
+3. 방금 생성한 `Dev Blog` integration 선택
+
+### 환경변수 설정
+
+```bash
+# .env.local
+NOTION_API_KEY=secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+NOTION_DATABASE_ID=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+CONTENT_PROVIDER=notion  # MDX에서 Notion으로 전환
 ```
-Default location for new attachments: attachments/
-Automatically update internal links: ON
-New link format: Shortest path when possible
-```
 
-**플러그인**:
-
-1. **Paste Image Rename**: 이미지 파일명 자동 정규화
-2. **Templater**: 포스트 템플릿 자동화
-
-### 포스트 템플릿
-
-```markdown
----
-title: <% tp.file.title %>
-publishedAt: <% tp.date.now("YYYY-MM-DD") %>
-excerpt: ""
-tags: []
-thumbnail: ""
----
-
-# <% tp.file.title %>
-
-<!-- 본문 작성 -->
-```
+**Database ID 찾는 방법**:
+- 데이터베이스 페이지 URL: `https://www.notion.so/{workspace}/{database_id}?v=...`
+- `database_id` 부분 복사 (32자리 영숫자)
 
 ### 산출물
 
-- Obsidian vault 설정 완료
-- 템플릿 파일 (`content/templates/post.md`)
-- `.gitignore` 업데이트
+- Notion Blog Posts 데이터베이스
+- Notion Integration + Token
+- `.env.local` 설정
 
 ### 완료 기준
 
-- [ ] Obsidian에서 `content/` 폴더 열기 가능
-- [ ] 이미지 붙여넣기 시 `attachments/`에 저장
-- [ ] 템플릿으로 새 포스트 생성 가능
+- [ ] Notion 데이터베이스에 샘플 포스트 1개 이상 작성
+- [ ] Integration이 데이터베이스에 연결됨
+- [ ] `.env.local`에 토큰 및 Database ID 설정
 
 ---
 
-## 2.2 ObsidianProvider 구현
+## 2.2 Notion SDK 및 NotionProvider 구현
 
 ### Tasks
 
-- [ ] `ObsidianProvider` 클래스 생성
-- [ ] 위키링크 변환 유틸리티 (`convertWikiLinks`)
-- [ ] 이미지 링크 변환 유틸리티 (`convertImageLinks`)
-- [ ] `.md` 파일 읽기 (`.mdx` 대신)
-- [ ] MDXProvider 대체
+- [ ] `@notionhq/client` 패키지 설치
+- [ ] `notion-to-md` 패키지 설치
+- [ ] NotionProvider 클래스 구현
+- [ ] Notion blocks → Markdown 변환 로직
+- [ ] 이미지 URL 처리
+- [ ] Provider 인터페이스 구현
 
-### lib/utils/obsidian.ts
+### Dependencies
 
-```typescript
-/**
- * Obsidian 위키링크를 마크다운 링크로 변환
- * [[포스트명]] → [포스트명](/posts/post-slug)
- */
-export function convertWikiLinks(content: string, allSlugs: string[]): string {
-  return content.replace(
-    /\[\[([^\]|]+)(\|([^\]]+))?\]\]/g,
-    (match, linkText, _, displayText) => {
-      // [[포스트명|표시텍스트]] 또는 [[포스트명]]
-      const display = displayText || linkText;
-      const slug = slugify(linkText);
-
-      // 실제 존재하는 포스트인지 확인
-      if (allSlugs.includes(slug)) {
-        return `[${display}](/posts/${slug})`;
-      }
-
-      // 존재하지 않으면 일반 텍스트로
-      return display;
-    }
-  );
-}
-
-/**
- * Obsidian 이미지 링크를 마크다운 이미지로 변환
- * ![[image.png]] → ![](/attachments/image.png)
- */
-export function convertImageLinks(content: string): string {
-  return content.replace(/!\[\[([^\]]+)\]\]/g, (match, imageName) => {
-    return `![](/attachments/${imageName})`;
-  });
-}
-
-/**
- * 문자열을 slug로 변환
- */
-export function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9가-힣]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
+```bash
+pnpm add @notionhq/client notion-to-md
 ```
 
-### lib/content/obsidian-provider.ts
+### lib/content/notion-provider.ts
 
 ```typescript
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
+import { Client } from "@notionhq/client";
+import { NotionToMarkdown } from "notion-to-md";
 import { Post, ContentProvider } from "./types";
-import { convertWikiLinks, convertImageLinks } from "../utils/obsidian";
 
-const POSTS_DIR = path.join(process.cwd(), "content/posts");
+const notion = new Client({
+  auth: process.env.NOTION_API_KEY,
+});
 
-export class ObsidianProvider implements ContentProvider {
+const n2m = new NotionToMarkdown({ notionClient: notion });
+
+const DATABASE_ID = process.env.NOTION_DATABASE_ID!;
+
+export class NotionProvider implements ContentProvider {
   async getAllPosts(): Promise<Post[]> {
-    const fileNames = fs.readdirSync(POSTS_DIR);
-    const allSlugs = fileNames
-      .filter((name) => name.endsWith(".md"))
-      .map((name) => name.replace(/\.md$/, ""));
+    const response = await notion.databases.query({
+      database_id: DATABASE_ID,
+      filter: {
+        property: "Published",
+        checkbox: {
+          equals: true,
+        },
+      },
+      sorts: [
+        {
+          property: "PublishedAt",
+          direction: "descending",
+        },
+      ],
+    });
 
-    const posts = fileNames
-      .filter((name) => name.endsWith(".md"))
-      .map((fileName) => this.parsePost(fileName, allSlugs))
-      .filter((post) => post !== null) as Post[];
-
-    return posts.sort(
-      (a, b) =>
-        new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    const posts = await Promise.all(
+      response.results.map((page) => this.pageToPost(page))
     );
+
+    return posts.filter((post): post is Post => post !== null);
   }
 
   async getPostBySlug(slug: string): Promise<Post | null> {
-    try {
-      const filePath = path.join(POSTS_DIR, `${slug}.md`);
-      if (!fs.existsSync(filePath)) {
-        return null;
-      }
+    const response = await notion.databases.query({
+      database_id: DATABASE_ID,
+      filter: {
+        and: [
+          {
+            property: "Published",
+            checkbox: {
+              equals: true,
+            },
+          },
+          {
+            property: "Slug",
+            rich_text: {
+              equals: slug,
+            },
+          },
+        ],
+      },
+    });
 
-      const allSlugs = fs
-        .readdirSync(POSTS_DIR)
-        .filter((name) => name.endsWith(".md"))
-        .map((name) => name.replace(/\.md$/, ""));
-
-      return this.parsePost(`${slug}.md`, allSlugs);
-    } catch (error) {
-      console.error(`Error reading post ${slug}:`, error);
+    if (response.results.length === 0) {
       return null;
     }
+
+    return this.pageToPost(response.results[0]);
   }
 
   async getPostsByTag(tag: string): Promise<Post[]> {
-    const posts = await this.getAllPosts();
-    return posts.filter((post) => post.tags.includes(tag));
+    const allPosts = await this.getAllPosts();
+    return allPosts.filter((post) => post.tags.includes(tag));
   }
 
   async getAllTags(): Promise<string[]> {
-    const posts = await this.getAllPosts();
+    const allPosts = await this.getAllPosts();
     const tagSet = new Set<string>();
-    posts.forEach((post) => post.tags.forEach((tag) => tagSet.add(tag)));
+    allPosts.forEach((post) => post.tags.forEach((tag) => tagSet.add(tag)));
     return Array.from(tagSet).sort();
   }
 
-  private parsePost(fileName: string, allSlugs: string[]): Post | null {
+  private async pageToPost(page: any): Promise<Post | null> {
     try {
-      const filePath = path.join(POSTS_DIR, fileName);
-      const fileContents = fs.readFileSync(filePath, "utf8");
-      const { data, content } = matter(fileContents);
+      const properties = page.properties;
 
-      // Obsidian 문법 변환
-      let convertedContent = convertWikiLinks(content, allSlugs);
-      convertedContent = convertImageLinks(convertedContent);
+      // Extract properties
+      const title = properties.Title?.title[0]?.plain_text || "";
+      const slug = properties.Slug?.rich_text[0]?.plain_text || "";
+      const excerpt = properties.Excerpt?.rich_text[0]?.plain_text || "";
+      const publishedAt = properties.PublishedAt?.date?.start || "";
+      const updatedAt = properties.UpdatedAt?.last_edited_time || "";
+      const tags = properties.Tags?.multi_select.map((tag: any) => tag.name) || [];
+      const thumbnail = properties.Thumbnail?.files[0]?.file?.url || properties.Thumbnail?.files[0]?.external?.url || "";
 
-      const slug = fileName.replace(/\.md$/, "");
+      // Convert page content to markdown
+      const mdblocks = await n2m.pageToMarkdown(page.id);
+      const mdString = n2m.toMarkdownString(mdblocks);
+      const content = mdString.parent || "";
 
       return {
         slug,
-        title: data.title || slug,
-        content: convertedContent,
-        excerpt: data.excerpt || "",
-        publishedAt: data.publishedAt || new Date().toISOString(),
-        updatedAt: data.updatedAt,
-        tags: data.tags || [],
-        thumbnail: data.thumbnail || "",
+        title,
+        content,
+        excerpt,
+        publishedAt,
+        updatedAt,
+        tags,
+        thumbnail,
       };
     } catch (error) {
-      console.error(`Error parsing ${fileName}:`, error);
+      console.error(`Error converting page to post:`, error);
       return null;
     }
   }
@@ -232,10 +242,17 @@ export class ObsidianProvider implements ContentProvider {
 ### lib/content/index.ts 업데이트
 
 ```typescript
-import { ObsidianProvider } from "./obsidian-provider";
+import { NotionProvider } from "./notion-provider";
+import { MDXProvider } from "./mdx-provider";
 
 export function getContentProvider() {
-  return new ObsidianProvider();
+  const provider = process.env.CONTENT_PROVIDER || "mdx";
+
+  if (provider === "notion") {
+    return new NotionProvider();
+  }
+
+  return new MDXProvider();
 }
 
 export type { Post, ContentProvider } from "./types";
@@ -243,85 +260,208 @@ export type { Post, ContentProvider } from "./types";
 
 ### 산출물
 
-- `lib/utils/obsidian.ts`
-- `lib/content/obsidian-provider.ts`
+- `lib/content/notion-provider.ts`
 - `lib/content/index.ts` 업데이트
+
+### Notion API CRUD 참고 (향후 확장용)
+
+Phase 2에서는 읽기 전용으로 구현하지만, 향후 앱 내에서 포스트를 관리하려면 다음 API를 사용:
+
+```typescript
+// Notion API CRUD
+// Create: POST https://api.notion.com/v1/pages
+// Update: PATCH https://api.notion.com/v1/pages/{page_id}
+// Archive (Delete): PATCH https://api.notion.com/v1/pages/{page_id}
+//   { "archived": true }
+
+// 예시: createPost 구현 (선택)
+async createPost(input: CreatePostInput): Promise<Post> {
+  const response = await notion.pages.create({
+    parent: { database_id: DATABASE_ID },
+    properties: {
+      Title: { title: [{ text: { content: input.title } }] },
+      Slug: { rich_text: [{ text: { content: input.slug } }] },
+      Excerpt: { rich_text: [{ text: { content: input.excerpt } }] },
+      Published: { checkbox: input.published || false },
+      PublishedAt: { date: { start: input.publishedAt || new Date().toISOString() } },
+      Tags: { multi_select: input.tags.map(tag => ({ name: tag })) },
+    },
+    children: [
+      {
+        object: 'block',
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [{ text: { content: input.content } }],
+        },
+      },
+    ],
+  });
+
+  return this.pageToPost(response);
+}
+
+// 예시: updatePost 구현 (선택)
+async updatePost(slug: string, input: UpdatePostInput): Promise<Post> {
+  const post = await this.getPostBySlug(slug);
+  if (!post) throw new Error('Post not found');
+
+  // page_id를 어딘가에 저장해둬야 함
+  // 또는 slug로 다시 검색하여 page_id 획득
+
+  const response = await notion.pages.update({
+    page_id: post.id,
+    properties: {
+      Title: input.title ? { title: [{ text: { content: input.title } }] } : undefined,
+      // ... 나머지 속성
+    },
+  });
+
+  return this.pageToPost(response);
+}
+```
+
+**참고**: Notion API로 페이지 컨텐츠(blocks)를 수정하려면 별도로 `blocks.children.append` API를 사용해야 합니다.
 
 ### 완료 기준
 
-- [ ] 위키링크가 일반 링크로 변환
-- [ ] 이미지 링크가 올바른 경로로 변환
-- [ ] 존재하지 않는 위키링크는 일반 텍스트로 표시
-- [ ] 모든 Provider 메서드 정상 동작
+- [ ] NotionProvider가 모든 ContentProvider 메서드 구현
+- [ ] Notion 데이터베이스에서 포스트 읽기 성공
+- [ ] Notion blocks가 Markdown으로 변환
+- [ ] 태그, 썸네일 등 모든 속성 정상 파싱
 
 ---
 
-## 2.3 MDX 제거 및 Markdown 렌더링 전환
+## 2.3 ISR 및 캐싱 설정
 
 ### Tasks
 
-- [ ] MDX 관련 패키지 제거
-- [ ] `react-markdown` 설치
-- [ ] PostContent 컴포넌트를 react-markdown으로 전환
-- [ ] mdx-components.tsx 제거
-- [ ] MDX 커스텀 컴포넌트를 일반 컴포넌트로 변경 (선택)
+- [ ] ISR revalidate 시간 설정
+- [ ] Notion API 요청 최적화
+- [ ] 로컬 개발 시 캐싱 고려 (선택)
+- [ ] 빌드 시간 최적화
 
-### Dependencies
-
-**제거**:
-
-```bash
-npm uninstall @next/mdx @mdx-js/loader @mdx-js/react next-mdx-remote
-```
-
-**설치**:
-
-```bash
-npm install react-markdown remark-gfm rehype-highlight rehype-raw
-```
-
-### PostContent 컴포넌트 업데이트
+### ISR 설정
 
 ```typescript
-// components/post/PostContent.tsx
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
-import rehypeRaw from "rehype-raw";
-import "highlight.js/styles/github-dark.css";
+// app/posts/[slug]/page.tsx
+export const revalidate = 3600; // 1시간마다 재생성
 
-interface PostContentProps {
-  content: string;
+// app/page.tsx
+export const revalidate = 1800; // 30분마다 재생성
+```
+
+### Notion API Rate Limit 고려
+
+Notion API는 rate limit이 있으므로:
+
+- ISR을 활용하여 빌드 시 모든 페이지 생성
+- 런타임에는 최소한의 API 요청만 발생
+- 필요 시 Redis 등으로 캐싱 추가 (Phase 3+)
+
+### 산출물
+
+- ISR 설정이 적용된 page 파일들
+
+### 완료 기준
+
+- [ ] ISR revalidate 설정 완료
+- [ ] 빌드 시 모든 포스트 정적 생성 확인
+- [ ] Notion API 요청 횟수가 최소화됨
+
+---
+
+## 2.4 Notion 이미지 처리
+
+### Tasks
+
+- [ ] Notion CDN 이미지 URL 처리
+- [ ] 만료되는 URL 대응 (Notion 이미지는 1시간 후 만료)
+- [ ] next/image 최적화 활용
+- [ ] 이미지 다운로드 및 로컬 저장 (선택)
+
+### Notion 이미지 URL 이슈
+
+Notion에서 제공하는 이미지 URL은 **1시간 후 만료**됩니다.
+
+**해결 방법**:
+
+1. **ISR 활용** (추천): revalidate 시간을 1시간 이하로 설정하여 주기적으로 새 URL 받아오기
+2. **이미지 다운로드**: 빌드 시 이미지를 다운로드하여 `public/` 폴더에 저장
+3. **프록시 서버**: 자체 이미지 프록시 구현 (고급)
+
+### 옵션 1: ISR로 URL 갱신 (간단)
+
+```typescript
+// app/posts/[slug]/page.tsx
+export const revalidate = 3000; // 50분마다 재생성 (1시간 이전)
+```
+
+### 옵션 2: 이미지 다운로드 스크립트
+
+```typescript
+// scripts/download-notion-images.ts
+import fs from "fs";
+import path from "path";
+import https from "https";
+import { NotionProvider } from "../lib/content/notion-provider";
+
+async function downloadImage(url: string, filepath: string) {
+  return new Promise((resolve, reject) => {
+    https.get(url, (response) => {
+      const fileStream = fs.createWriteStream(filepath);
+      response.pipe(fileStream);
+      fileStream.on("finish", () => {
+        fileStream.close();
+        resolve(filepath);
+      });
+    }).on("error", reject);
+  });
 }
 
-export function PostContent({ content }: PostContentProps) {
-  return (
-    <article className="prose dark:prose-invert max-w-none">
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeHighlight, rehypeRaw]}
-        components={{
-          // 커스텀 렌더링 (선택)
-          h2: ({ children }) => (
-            <h2 id={slugify(String(children))}>{children}</h2>
-          ),
-        }}
-      >
-        {content}
-      </ReactMarkdown>
-    </article>
-  );
+async function downloadAllImages() {
+  const provider = new NotionProvider();
+  const posts = await provider.getAllPosts();
+
+  for (const post of posts) {
+    if (post.thumbnail) {
+      const filename = `${post.slug}-thumbnail.jpg`;
+      const filepath = path.join(process.cwd(), "public/images", filename);
+
+      await downloadImage(post.thumbnail, filepath);
+      console.log(`Downloaded: ${filename}`);
+    }
+  }
+}
+
+downloadAllImages();
+```
+
+```json
+// package.json
+{
+  "scripts": {
+    "prebuild": "tsx scripts/download-notion-images.ts",
+    "build": "next build"
+  }
 }
 ```
 
-### next.config.js 업데이트
+### next.config.js 이미지 설정
 
 ```javascript
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // MDX 설정 제거
   images: {
-    remotePatterns: [],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "**.amazonaws.com", // Notion CDN
+      },
+      {
+        protocol: "https",
+        hostname: "prod-files-secure.s3.**.amazonaws.com",
+      },
+    ],
   },
 };
 
@@ -330,214 +470,269 @@ module.exports = nextConfig;
 
 ### 산출물
 
-- `components/post/PostContent.tsx` 업데이트
-- `next.config.js` 업데이트
-- MDX 관련 파일 제거
+- ISR 시간 조정 또는 이미지 다운로드 스크립트
+- `next.config.js` 이미지 도메인 설정
 
 ### 완료 기준
 
-- [ ] Markdown 정상 렌더링
-- [ ] 코드 하이라이팅 동작
-- [ ] MDX 의존성 완전 제거
-- [ ] 빌드 에러 없음
+- [ ] Notion 이미지가 블로그에 정상 표시
+- [ ] 이미지 만료 문제 해결 (ISR 또는 다운로드)
+- [ ] next/image 최적화 동작
 
 ---
 
-## 2.4 이미지 경로 처리
+## 2.5 Webhook을 통한 자동 빌드 (선택)
 
 ### Tasks
 
-- [ ] `public/attachments/` 경로 설정
-- [ ] Obsidian `attachments/` → `public/attachments/` 연결
-- [ ] 심볼릭 링크 또는 빌드 스크립트
-- [ ] next.config.js 이미지 설정
+- [ ] Vercel Deploy Hook 생성
+- [ ] Notion Automation 설정 (Make.com 또는 Zapier)
+- [ ] 포스트 발행 시 자동 빌드 트리거
 
-### 옵션 1: 심볼릭 링크 (개발 환경 추천)
+### Vercel Deploy Hook
 
-```bash
-# content/attachments를 public/attachments로 심볼릭 링크
-ln -s ../content/attachments public/attachments
-```
+1. Vercel 프로젝트 Settings → Git → Deploy Hooks
+2. Hook name: `Notion Publish Trigger`
+3. Branch: `main`
+4. "Create Hook" 클릭
+5. **Webhook URL** 복사
 
-### 옵션 2: 빌드 스크립트
+### Notion Automation (Make.com 사용)
 
-```json
-// package.json
-{
-  "scripts": {
-    "dev": "next dev",
-    "prebuild": "mkdir -p public/attachments && cp -r content/attachments/* public/attachments/ || true",
-    "build": "next build",
-    "start": "next start"
-  }
-}
-```
+1. [Make.com](https://www.make.com) 가입 (무료 플랜 가능)
+2. 새 시나리오 생성
+3. **트리거 모듈 추가**: Notion → Watch Database Items
+   - **Connection**: Notion 계정 연결 (Integration 사용)
+   - **Database ID**: Blog Posts 데이터베이스 ID 입력
+   - **Properties to Watch**: `Published` 체크박스 선택
+   - **Trigger**: `On update` 또는 `On create/update`
+   - **Filter**: Published = true 조건 추가
 
-### .gitignore 업데이트
+4. **액션 모듈 추가**: HTTP → Make a Request
+   - **URL**: Vercel Deploy Hook URL 붙여넣기
+   - **Method**: POST
+   - **Headers** (선택):
+     ```json
+     {
+       "Content-Type": "application/json"
+     }
+     ```
+   - **Body** (선택): 빌드 정보 전달
+     ```json
+     {
+       "trigger": "notion",
+       "post_title": "{{1.properties.Title.title[].plain_text}}"
+     }
+     ```
 
-```
-# Obsidian
-.obsidian/workspace
-.obsidian/workspace.json
+5. **시나리오 저장 및 활성화**
+   - "Save" → "Schedule" → "On" 으로 설정
+   - Interval: 15분마다 체크 (무료 플랜 기준)
 
-# 심볼릭 링크 사용 시
-public/attachments
+**Make.com 제약사항**:
+- 무료 플랜: 월 1,000 operations
+- 최소 체크 주기: 15분
+- 대안: Zapier (유료), n8n (셀프 호스팅)
+
+### 대안: GitHub Actions (고급)
+
+Notion API를 주기적으로 폴링하여 변경사항 감지 후 빌드:
+
+```yaml
+# .github/workflows/notion-sync.yml
+name: Sync from Notion
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # 6시간마다
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check Notion changes
+        run: |
+          # Notion API 체크 로직
+          # 변경사항 있으면 Vercel Deploy Hook 호출
 ```
 
 ### 산출물
 
-- 이미지 경로 설정
-- 빌드 스크립트 (선택)
+- Vercel Deploy Hook
+- Make.com 시나리오 또는 GitHub Actions
 
 ### 완료 기준
 
-- [ ] Obsidian에서 붙여넣은 이미지가 블로그에 표시
-- [ ] `/attachments/image.png` 경로로 접근 가능
-- [ ] 빌드 시 이미지 정상 포함
+- [ ] Notion에서 포스트 발행 시 자동 빌드
+- [ ] 5-10분 내 블로그 업데이트 반영
 
 ---
 
-## 2.5 기존 MDX 포스트 마이그레이션
+## 2.6 Notion 워크플로우 테스트
 
 ### Tasks
 
-- [ ] MDX 포스트를 Markdown으로 변환
-- [ ] JSX 컴포넌트를 일반 Markdown으로 변경
-- [ ] 파일 확장자 변경 (.mdx → .md)
-- [ ] 이미지 경로 확인 및 수정
-
-### 마이그레이션 스크립트 (선택)
-
-```typescript
-// scripts/migrate-mdx-to-md.ts
-import fs from "fs";
-import path from "path";
-
-const POSTS_DIR = "content/posts";
-
-fs.readdirSync(POSTS_DIR).forEach((file) => {
-  if (file.endsWith(".mdx")) {
-    const oldPath = path.join(POSTS_DIR, file);
-    const newPath = path.join(POSTS_DIR, file.replace(".mdx", ".md"));
-
-    let content = fs.readFileSync(oldPath, "utf8");
-
-    // MDX 컴포넌트를 Markdown으로 변환
-    // 예: <Callout>...</Callout> → > **Note**: ...
-    content = content.replace(
-      /<Callout type="info">([\s\S]*?)<\/Callout>/g,
-      (_, inner) => `> **ℹ️ Info**\n> ${inner.trim()}`
-    );
-
-    fs.writeFileSync(newPath, content);
-    fs.unlinkSync(oldPath);
-
-    console.log(`Migrated: ${file} → ${file.replace(".mdx", ".md")}`);
-  }
-});
-```
-
-### 수동 변환 가이드
-
-**Before (MDX)**:
-
-```mdx
-<Callout type="info">이것은 정보 박스입니다.</Callout>
-```
-
-**After (Markdown)**:
-
-```markdown
-> **ℹ️ Info**
->
-> 이것은 정보 박스입니다.
-```
-
-### 산출물
-
-- Markdown으로 변환된 포스트
-- 마이그레이션 스크립트 (선택)
-
-### 완료 기준
-
-- [ ] 모든 포스트가 `.md` 확장자로 변환
-- [ ] MDX 전용 문법 제거
-- [ ] 기존 포스트 정상 렌더링
-
----
-
-## 2.6 Obsidian 워크플로우 테스트
-
-### Tasks
-
-- [ ] Obsidian에서 새 포스트 작성
-- [ ] 위키링크 사용해보기
-- [ ] 이미지 붙여넣기 테스트
-- [ ] Git commit & push
-- [ ] Vercel 자동 배포 확인
+- [ ] Notion에서 새 포스트 작성
+- [ ] 모든 속성 채우기
+- [ ] Published 체크박스 활성화
+- [ ] 로컬 개발 서버에서 확인
+- [ ] 빌드 및 배포 테스트
 - [ ] 블로그에서 정상 표시 확인
 
 ### 테스트 시나리오
 
 1. **새 포스트 작성**
+   - Notion Blog Posts 데이터베이스에서 "New" 클릭
+   - Title: `Notion으로 블로그 포스팅하기`
+   - Slug: `notion-blog-posting`
+   - Excerpt: `Notion을 CMS로 활용한 블로그 운영기`
+   - Tags: `notion`, `blog`
+   - Published: ✅
+   - PublishedAt: 오늘 날짜
 
-   ```markdown
-   ---
-   title: "Obsidian 테스트"
-   publishedAt: "2025-01-09"
-   excerpt: "Obsidian으로 작성한 테스트 포스트"
-   tags: ["test", "obsidian"]
-   ---
+2. **본문 작성**
+   - Heading, Paragraph, Code block 등 다양한 블록 사용
+   - 이미지 삽입 테스트
 
-   # Obsidian 테스트
-
-   이전 글: [[Hello World]]
-
-   이미지 테스트:
-   ![[test-image.png]]
+3. **로컬 확인**
+   ```bash
+   pnpm dev
    ```
+   - http://localhost:3000 접속
+   - 포스트 목록에 새 포스트 표시 확인
+   - 포스트 상세 페이지 확인
+   - Markdown 변환 정상 확인
 
-2. **이미지 추가**
-
-   - 스크린샷 복사 → Obsidian에 붙여넣기
-   - 자동으로 `attachments/` 폴더에 저장되는지 확인
-
-3. **Git Workflow**
-
+4. **배포 테스트**
    ```bash
    git add .
-   git commit -m "Add: Obsidian 테스트 포스트"
+   git commit -m "feat: Add Notion CMS integration"
    git push origin main
    ```
-
-4. **배포 확인**
    - Vercel 빌드 성공 확인
-   - 블로그에서 포스트 확인
-   - 위키링크 변환 확인
-   - 이미지 표시 확인
+   - 프로덕션에서 포스트 확인
 
 ### 완료 기준
 
-- [ ] Obsidian에서 포스트 작성 가능
-- [ ] 위키링크 정상 변환
+- [ ] Notion에서 포스트 작성 및 발행 가능
+- [ ] 로컬 개발 서버에서 포스트 표시
+- [ ] 빌드 에러 없음
+- [ ] 프로덕션 배포 성공
+- [ ] 모든 Notion 블록이 Markdown으로 변환
 - [ ] 이미지 정상 표시
-- [ ] Git push → 자동 배포 성공
-- [ ] 블로그에서 모든 기능 동작
+
+---
+
+## 2.7 트러블슈팅 및 팁
+
+### 자주 발생하는 문제
+
+**1. Notion API 응답이 느림**
+```typescript
+// 해결: 병렬 요청으로 최적화
+const posts = await Promise.all(
+  response.results.map(async (page) => {
+    const content = await this.pageToPost(page);
+    return content;
+  })
+);
+```
+
+**2. 한글 Slug가 깨짐**
+```typescript
+// 해결: slugify 라이브러리 사용
+import slugify from 'slugify';
+
+const slug = slugify(title, {
+  lower: true,
+  strict: true,
+  locale: 'ko'
+});
+```
+
+**3. Notion 블록 타입이 지원되지 않음**
+```typescript
+// notion-to-md는 모든 블록 타입을 지원하지 않음
+// 지원 블록: paragraph, heading, bulleted_list, code, quote 등
+// 미지원: toggle, callout 등
+
+// 해결: 커스텀 변환 로직 추가
+n2m.setCustomTransformer('callout', async (block) => {
+  const { callout } = block as any;
+  const text = callout.rich_text[0]?.plain_text || '';
+  return `> **${callout.icon?.emoji || '📌'}** ${text}`;
+});
+```
+
+**4. 빌드 시간이 너무 오래 걸림**
+```typescript
+// 해결: 캐싱 추가
+import { unstable_cache } from 'next/cache';
+
+const getCachedPosts = unstable_cache(
+  async () => provider.getAllPosts(),
+  ['notion-posts'],
+  { revalidate: 3600 }
+);
+```
+
+### 개발 팁
+
+**1. 로컬 개발 시 .env.local 설정**
+```bash
+# .env.local
+NOTION_API_KEY=secret_xxx
+NOTION_DATABASE_ID=xxx
+CONTENT_PROVIDER=mdx  # 로컬에서는 MDX 사용
+
+# 프로덕션에서만 Notion 사용
+# Vercel Environment Variables에서 CONTENT_PROVIDER=notion 설정
+```
+
+**2. Notion 데이터베이스 템플릿 복제**
+- 데이터베이스 우측 상단 `...` → `Duplicate`
+- 여러 환경(dev/staging/prod)에서 각각 사용
+
+**3. 에러 로깅**
+```typescript
+// lib/content/notion-provider.ts
+private async pageToPost(page: any): Promise<Post | null> {
+  try {
+    // ... 변환 로직
+  } catch (error) {
+    console.error('Failed to convert Notion page:', {
+      pageId: page.id,
+      error: error.message,
+      page: JSON.stringify(page, null, 2)
+    });
+    return null;
+  }
+}
+```
+
+**4. Notion API Rate Limit 모니터링**
+```typescript
+// Notion API 헤더 확인
+const response = await notion.databases.query({ ... });
+console.log('Rate limit remaining:', response.headers['x-notion-request-id']);
+```
 
 ---
 
 ## Phase 2 최종 체크리스트
 
-- [ ] Obsidian vault 설정 완료
-- [ ] ObsidianProvider 구현 및 테스트
-- [ ] 위키링크 변환 정상 동작
-- [ ] 이미지 링크 변환 정상 동작
-- [ ] MDX 완전히 제거 (Markdown으로 전환)
-- [ ] 기존 포스트 마이그레이션 완료
-- [ ] 이미지 경로 처리 동작 확인
-- [ ] Obsidian 워크플로우 테스트 완료
+- [ ] Notion 데이터베이스 및 Integration 설정 완료
+- [ ] NotionProvider 구현 및 테스트
+- [ ] Notion blocks → Markdown 변환 정상 동작
+- [ ] 이미지 URL 처리 완료 (만료 문제 해결)
+- [ ] ISR 설정 및 최적화
+- [ ] Notion에서 포스트 작성 및 발행 테스트
+- [ ] 자동 빌드 트리거 설정 (선택)
 - [ ] Git push → Vercel 배포 정상 동작
 - [ ] 모든 페이지 정상 렌더링
+- [ ] 에러 로깅 및 모니터링 설정
 
 ---
 
@@ -554,7 +749,9 @@ Phase 3에서는 **SEO 최적화**를 진행합니다:
 
 ## 참고 자료
 
-- [Obsidian Help](https://help.obsidian.md/)
-- [Neil Mathew - Next.js Blog with Obsidian](https://www.neilmathew.co/posts/nextjs-blog-with-obsidian-as-cms)
-- [react-markdown](https://github.com/remarkjs/react-markdown)
-- [remark-gfm](https://github.com/remarkjs/remark-gfm)
+- [Notion API Documentation](https://developers.notion.com/)
+- [@notionhq/client](https://github.com/makenotion/notion-sdk-js)
+- [notion-to-md](https://github.com/souvikinator/notion-to-md)
+- [Vercel Deploy Hooks](https://vercel.com/docs/concepts/git/deploy-hooks)
+- [Make.com](https://www.make.com) - Automation platform
+- [Next.js ISR](https://nextjs.org/docs/basic-features/data-fetching/incremental-static-regeneration)

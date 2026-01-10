@@ -16,7 +16,7 @@
 ├─────────────────────────────────────────┤
 │       ContentProvider Interface         │
 ├──────────────┬──────────────────────────┤
-│ MDXProvider  │  ObsidianProvider        │
+│ MDXProvider  │  NotionProvider          │
 │  (Phase 1)   │    (Phase 2)             │
 └──────────────┴──────────────────────────┘
 ```
@@ -62,16 +62,17 @@ content/
 
 ---
 
-### Phase 2: Obsidian CMS 마이그레이션 🔄 (예정)
+### Phase 2: Notion CMS 마이그레이션 🔄 (예정)
 
-**목표**: MDX → Obsidian 기반 CMS로 전환
+**목표**: MDX → Notion 기반 CMS로 전환
 
 **주요 작업**:
-- ObsidianProvider 구현
-- Wiki-link 변환 (`[[Page]]` → `[Page](/posts/slug)`)
-- 이미지 첨부파일 처리 (`![[image.png]]`)
-- MDX 제거, Markdown으로 전환
-- Obsidian vault 설정
+- NotionProvider 구현
+- Notion API 연동
+- Notion Database를 컨텐츠 소스로 활용
+- Notion blocks → Markdown 변환
+- 이미지 URL 처리 (만료 대응)
+- 자동 빌드 트리거 (Webhook)
 
 **마이그레이션 전략**:
 ```typescript
@@ -80,19 +81,19 @@ import { MDXProvider } from './mdx-provider';
 export const provider = new MDXProvider();
 
 // After (Phase 2)
-import { ObsidianProvider } from './obsidian-provider';
-export const provider = new ObsidianProvider();
+import { NotionProvider } from './notion-provider';
+export const provider = new NotionProvider();
 ```
 
 **워크플로우**:
 ```
-Obsidian에서 포스트 작성
+Notion에서 포스트 작성
   ↓
-Git commit & push
+Published 체크
   ↓
-Vercel 자동 배포
+Webhook → Vercel 빌드
   ↓
-블로그에 반영
+블로그에 자동 반영
 ```
 
 📄 **상세 문서**: [PHASE_2.md](./PHASE_2.md)
@@ -267,12 +268,13 @@ const files = fs.readdirSync('./content/posts');
 - [ ] 다크모드
 - [ ] Vercel 배포
 
-### Milestone 2: Obsidian 전환 (Phase 2)
+### Milestone 2: Notion 전환 (Phase 2)
 **예상 기간**: 1주
-- [ ] ObsidianProvider 구현
-- [ ] Wiki-link 변환
-- [ ] 이미지 처리
-- [ ] 워크플로우 테스트
+- [ ] Notion 데이터베이스 설정
+- [ ] NotionProvider 구현
+- [ ] Notion blocks → Markdown 변환
+- [ ] 이미지 URL 처리
+- [ ] 자동 빌드 트리거 설정
 
 ### Milestone 3: SEO 최적화 (Phase 3)
 **예상 기간**: 1주
@@ -294,11 +296,11 @@ const files = fs.readdirSync('./content/posts');
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Tailwind CSS](https://tailwindcss.com/)
 - [MDX](https://mdxjs.com/)
-- [Obsidian Help](https://help.obsidian.md/)
+- [Notion API](https://developers.notion.com/)
 
 ### 레퍼런스 블로그
 - [zoomkod.ing](https://zoomkod.ing/) - 디자인 레퍼런스
-- [Neil Mathew - Obsidian CMS](https://www.neilmathew.co/posts/nextjs-blog-with-obsidian-as-cms)
+- [Notion API 예제들](https://developers.notion.com/docs/examples)
 
 ### 라이브러리
 - [next-themes](https://github.com/pacocoursey/next-themes)
