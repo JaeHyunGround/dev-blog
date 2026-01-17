@@ -1,17 +1,16 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { ThemeToggle } from '@/components/common/ThemeToggle';
+import Link from "next/link";
+import { useState } from "react";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'Posts', href: '/posts' },
-    { name: 'Tags', href: '/tags' },
-    { name: 'About', href: '/about' },
+    { name: "Home", href: "/" },
+    { name: "Posts", href: "/posts" },
+    { name: "About", href: "/about" },
   ];
 
   return (
