@@ -90,24 +90,9 @@ export default async function PostPage({ params }: PostPageProps) {
 
         {/* Meta Info */}
         <div className="flex flex-wrap items-center gap-3 text-muted-foreground mb-4 text-sm">
-          <time dateTime={post.publishedAt}>
-            {formattedDate}
-          </time>
+          <time dateTime={post.publishedAt}>{formattedDate}</time>
           <span>·</span>
           <span>{formatReadingTime(post.readingTime)}</span>
-          {post.updatedAt && post.updatedAt !== post.publishedAt && (
-            <>
-              <span>·</span>
-              <span>
-                최종 수정:{" "}
-                {new Date(post.updatedAt).toLocaleDateString("ko-KR", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </span>
-            </>
-          )}
         </div>
 
         {/* Tags */}

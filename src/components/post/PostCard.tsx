@@ -1,16 +1,16 @@
-import Link from 'next/link';
-import type { Post } from '@/lib/content/types';
-import { formatReadingTime } from '@/lib/utils/reading-time';
+import Link from "next/link";
+import type { Post } from "@/lib/content/types";
+import { formatReadingTime } from "@/lib/utils/reading-time";
 
 interface PostCardProps {
   post: Post;
 }
 
 export function PostCard({ post }: PostCardProps) {
-  const formattedDate = new Date(post.publishedAt).toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+  const formattedDate = new Date(post.publishedAt).toLocaleDateString("ko-KR", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 
   return (
@@ -29,9 +29,7 @@ export function PostCard({ post }: PostCardProps) {
       <div className="flex items-center justify-between flex-wrap gap-3">
         {/* Date & Reading Time */}
         <div className="flex items-center gap-3 text-sm text-muted-foreground">
-          <time dateTime={post.publishedAt}>
-            {formattedDate}
-          </time>
+          <time dateTime={post.publishedAt}>{formattedDate}</time>
           <span>·</span>
           <span>{formatReadingTime(post.readingTime)}</span>
         </div>
@@ -51,20 +49,6 @@ export function PostCard({ post }: PostCardProps) {
           </div>
         )}
       </div>
-
-      {/* Updated Date (if exists) */}
-      {post.updatedAt && post.updatedAt !== post.publishedAt && (
-        <div className="mt-3 pt-3 border-t border-border">
-          <p className="text-xs text-muted-foreground">
-            최종 수정:{' '}
-            {new Date(post.updatedAt).toLocaleDateString('ko-KR', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </p>
-        </div>
-      )}
     </article>
   );
 }
