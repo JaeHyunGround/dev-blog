@@ -1,7 +1,8 @@
-'use client';
+"use client";
 
-import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+import { cn } from "@/lib/utils/cn";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
@@ -25,11 +26,14 @@ export function ThemeToggle() {
 
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-      aria-label={`${theme === 'dark' ? '라이트' : '다크'} 모드로 전환`}
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className={cn(
+        theme === "dark" ? "hover:bg-gray-600" : "hover:bg-gray-100",
+        "rounded-lg p-2 dark:hover:bg-gray-800 transition-colors",
+      )}
+      aria-label={`${theme === "dark" ? "라이트" : "다크"} 모드로 전환`}
     >
-      {theme === 'dark' ? (
+      {theme === "dark" ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
