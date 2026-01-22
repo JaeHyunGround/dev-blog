@@ -21,7 +21,7 @@ export function Header() {
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
               <span className="text-xl font-bold text-foreground hover:text-primary transition-colors">
-                Dev Blog
+                JaehyunGround
               </span>
             </Link>
           </div>
