@@ -12,14 +12,11 @@ export default async function HomePage() {
   return (
     <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12">
       {/* Hero Section */}
-      <div className="mb-12">
+      {/* <div className="mb-12">
         <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4">
-          Dev Blog
+          {`Jaehyun's Dev Blog`}
         </h1>
-        <p className="text-lg text-muted-foreground">
-          Next.js와 MDX로 작성하는 개인 기술 블로그
-        </p>
-      </div>
+      </div> */}
 
       {/* Latest Posts Section */}
       <section>

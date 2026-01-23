@@ -8,20 +8,23 @@ const POSTS_DIR = path.join(process.cwd(), "content/posts");
 
 /**
  * MDX 파일 기반 Content Provider
- * content/posts/ 디렉토리의 MDX 파일을 읽어 포스트 데이터를 제공
+ *
+ * 지원하는 구조:
+ * 1. 폴더 기반: content/posts/my-post/index.mdx (이미지와 함께 관리)
+ * 2. 파일 기반: content/posts/my-post.mdx (하위 호환)
  */
 export class MDXProvider implements ContentProvider {
   /**
    * 모든 포스트를 가져옵니다 (최신순 정렬)
    */
   async getAllPosts(): Promise<Post[]> {
-    const fileNames = this.getPostFilePaths();
-    const posts = fileNames
-      .map((fileName) => {
+    const postSlugs = this.getPostSlugs();
+    const posts = postSlugs
+      .map((slug) => {
         try {
-          return this.readPostFile(fileName);
+          return this.readPost(slug);
         } catch (error) {
-          console.error(`Error reading post file ${fileName}:`, error);
+          console.error(`Error reading post ${slug}:`, error);
           return null;
         }
       })
@@ -39,17 +42,7 @@ export class MDXProvider implements ContentProvider {
    */
   async getPostBySlug(slug: string): Promise<Post | null> {
     try {
-      // .mdx 또는 .md 파일 시도
-      const mdxPath = `${slug}.mdx`;
-      const mdPath = `${slug}.md`;
-
-      if (fs.existsSync(path.join(POSTS_DIR, mdxPath))) {
-        return this.readPostFile(mdxPath);
-      } else if (fs.existsSync(path.join(POSTS_DIR, mdPath))) {
-        return this.readPostFile(mdPath);
-      }
-
-      return null;
+      return this.readPost(slug);
     } catch (error) {
       console.error(`Error reading post ${slug}:`, error);
       return null;
@@ -75,31 +68,65 @@ export class MDXProvider implements ContentProvider {
   }
 
   /**
-   * MDX 파일 경로 목록을 가져옵니다
+   * 모든 포스트의 slug 목록을 가져옵니다
+   * 폴더 기반과 파일 기반 모두 지원
    */
-  private getPostFilePaths(): string[] {
+  private getPostSlugs(): string[] {
     if (!fs.existsSync(POSTS_DIR)) {
       return [];
     }
-    return fs.readdirSync(POSTS_DIR).filter((path) => /\.mdx?$/.test(path));
+
+    const slugs: string[] = [];
+    const entries = fs.readdirSync(POSTS_DIR, { withFileTypes: true });
+
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        // 폴더 기반: content/posts/my-post/index.mdx
+        const indexMdx = path.join(POSTS_DIR, entry.name, "index.mdx");
+        const indexMd = path.join(POSTS_DIR, entry.name, "index.md");
+        if (fs.existsSync(indexMdx) || fs.existsSync(indexMd)) {
+          slugs.push(entry.name);
+        }
+      } else if (/\.mdx?$/.test(entry.name)) {
+        // 파일 기반: content/posts/my-post.mdx
+        slugs.push(entry.name.replace(/\.mdx?$/, ""));
+      }
+    }
+
+    return slugs;
   }
 
   /**
-   * 파일명에서 slug를 추출합니다
+   * slug로 포스트 파일 경로를 찾습니다
    */
-  private getSlugFromFilename(filename: string): string {
-    return filename.replace(/\.mdx?$/, "");
+  private getPostFilePath(slug: string): string | null {
+    // 1. 폴더 기반 확인
+    const folderIndexMdx = path.join(POSTS_DIR, slug, "index.mdx");
+    const folderIndexMd = path.join(POSTS_DIR, slug, "index.md");
+
+    if (fs.existsSync(folderIndexMdx)) return folderIndexMdx;
+    if (fs.existsSync(folderIndexMd)) return folderIndexMd;
+
+    // 2. 파일 기반 확인
+    const fileMdx = path.join(POSTS_DIR, `${slug}.mdx`);
+    const fileMd = path.join(POSTS_DIR, `${slug}.md`);
+
+    if (fs.existsSync(fileMdx)) return fileMdx;
+    if (fs.existsSync(fileMd)) return fileMd;
+
+    return null;
   }
 
   /**
-   * MDX 파일을 읽어 Post 객체로 변환합니다
+   * 포스트를 읽어 Post 객체로 변환합니다
    */
-  private readPostFile(filename: string): Post {
-    const filePath = path.join(POSTS_DIR, filename);
+  private readPost(slug: string): Post | null {
+    const filePath = this.getPostFilePath(slug);
+    if (!filePath) return null;
+
     const fileContents = fs.readFileSync(filePath, "utf8");
     const { data, content } = matter(fileContents);
 
-    const slug = this.getSlugFromFilename(filename);
     const frontmatter = data as PostFrontmatter;
     const readingTime = calculateReadingTime(content);
 

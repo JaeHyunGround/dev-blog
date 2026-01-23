@@ -17,7 +17,7 @@ This is a Next.js 14+ personal blog project with SEO optimization, built using t
 | Framework      | Next.js 14+ (App Router)                         |
 | Language       | TypeScript                                       |
 | Styling        | Tailwind CSS                                     |
-| Content Source | MDX (Phase 1) → Obsidian CMS (Phase 2)          |
+| Content Source | MDX (Phase 1) → Notion CMS (Phase 2)            |
 | Comments       | utterances (GitHub Issues)                       |
 | Deployment     | Vercel                                           |
 | Markdown       | react-markdown, remark-gfm, rehype-highlight     |
@@ -46,7 +46,8 @@ interface ContentProvider {
   getPostBySlug(slug: string): Promise<Post | null>;
   getAllTags(): Promise<string[]>;
   getPostsByTag(tag: string): Promise<Post[]>;
-  // Phase 2: Obsidian migration
+  // Phase 2: Notion migration
+  syncFromNotion?(): Promise<void>;
   createPost?(post: Partial<Post>): Promise<Post>;
   updatePost?(slug: string, post: Partial<Post>): Promise<Post>;
   deletePost?(slug: string): Promise<void>;
@@ -58,8 +59,8 @@ interface ContentProvider {
 ```typescript
 // lib/content/index.ts
 const provider =
-  process.env.CONTENT_PROVIDER === "obsidian"
-    ? new ObsidianProvider()
+  process.env.CONTENT_PROVIDER === "notion"
+    ? new NotionProvider()
     : new MDXProvider();
 ```
 
@@ -82,7 +83,7 @@ const provider =
 │   │   ├── types.ts
 │   │   ├── index.ts
 │   │   ├── mdx-provider.ts
-│   │   └── obsidian-provider.ts (Phase 2)
+│   │   └── notion-provider.ts (Phase 2)
 │   └── utils/                # Utility functions
 ├── content/
 │   └── posts/                # MDX files (Phase 1)
@@ -99,11 +100,12 @@ const provider =
 - Dark mode with next-themes
 - Reference design implementation (zoomkod.ing inspired)
 
-### Phase 2: Obsidian CMS Migration
-- Obsidian vault integration
-- Wiki-link conversion (`[[link]]` → `[link](/posts/slug)`)
-- Image attachment handling
-- Bi-directional sync consideration
+### Phase 2: Notion CMS Migration
+- Notion API integration
+- Notion database as content source
+- Automatic content sync from Notion
+- Rich text block conversion to Markdown
+- Image URL handling from Notion CDN
 
 ### Phase 3: SEO & Image Management
 - sitemap.xml, robots.txt
@@ -216,11 +218,12 @@ When implementing providers:
    - Use `next-mdx-remote` for rendering
    - Sort posts by `publishedAt` (newest first)
 
-2. **Obsidian Provider (Phase 2)**:
-   - Read from Obsidian vault directory
-   - Convert wiki-links: `[[Page]]` → `[Page](/posts/page-slug)`
-   - Handle image attachments: `![[image.png]]` → `![](/attachments/image.png)`
-   - Support YAML frontmatter
+2. **Notion Provider (Phase 2)**:
+   - Connect to Notion API using official SDK
+   - Query Notion database for published posts
+   - Convert Notion blocks to Markdown
+   - Handle Notion images and embed URLs
+   - Cache results for performance
 
 ### SEO Best Practices
 
