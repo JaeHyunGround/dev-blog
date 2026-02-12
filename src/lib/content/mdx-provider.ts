@@ -127,14 +127,26 @@ export class MDXProvider implements ContentProvider {
     const fileContents = fs.readFileSync(filePath, "utf8");
     const { data, content } = matter(fileContents);
 
-    const frontmatter = data as PostFrontmatter;
+    const frontmatter = data as Partial<PostFrontmatter>;
+
+    // 필수 프론트매터 필드 검증
+    if (!frontmatter.title || !frontmatter.publishedAt || !frontmatter.excerpt) {
+      console.warn(`Post "${slug}" is missing required frontmatter fields, skipping.`);
+      return null;
+    }
+
     const readingTime = calculateReadingTime(content);
 
     return {
       slug,
       content,
       readingTime,
-      ...frontmatter,
+      title: frontmatter.title,
+      publishedAt: frontmatter.publishedAt,
+      excerpt: frontmatter.excerpt,
+      tags: frontmatter.tags ?? [],
+      thumbnail: frontmatter.thumbnail,
+      updatedAt: frontmatter.updatedAt,
     };
   }
 }
