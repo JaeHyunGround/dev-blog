@@ -181,9 +181,7 @@ export default function AboutPage() {
           <span className="text-4xl font-bold text-primary">JH</span>
         </div>
         <h1 className="text-3xl font-bold mb-2">안재현</h1>
-        <p className="text-muted-foreground text-lg mb-6">
-          Frontend Developer
-        </p>
+        <p className="text-muted-foreground text-lg mb-6">Frontend Developer</p>
         <div className="flex justify-center gap-3">
           {contacts.map((contact) => (
             <a
@@ -216,13 +214,13 @@ export default function AboutPage() {
             전반의 안정성과 유지보수성을 개선하는 작업을 주로 담당했습니다.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            기능 요구사항을 그대로 구현하기보다, 사용자가 실제로 겪는 불편과 운영
-            과정에서 발생하는 리스크를 기준으로 구조를 정리하고 개선하는 방식으로
-            일해왔습니다.
+            기능 요구사항을 그대로 구현하기보다, 사용자가 실제로 겪는 불편과
+            운영 과정에서 발생하는 리스크를 기준으로 구조를 정리하고 개선하는
+            방식으로 일해왔습니다.
           </p>
           <p className="text-muted-foreground leading-relaxed">
-            또한 지식이 개인에게 머무르지 않도록, 사내 개발 아티클 공유를
-            제안·시작하며 팀 내 지식 공유에 기여해왔습니다.
+            또한, 사내 개발 아티클 공유를 제안·시작하며 팀 내 지식 공유에
+            기여해왔습니다.
           </p>
         </div>
       </section>
