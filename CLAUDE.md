@@ -18,7 +18,7 @@ This is a Next.js 14+ personal blog project with SEO optimization, built using t
 | Language       | TypeScript                                       |
 | Styling        | Tailwind CSS                                     |
 | Content Source | MDX (Phase 1) → Notion CMS (Phase 2)            |
-| Comments       | utterances (GitHub Issues)                       |
+| Comments       | giscus (GitHub Discussions)                      |
 | Deployment     | Vercel                                           |
 | Markdown       | react-markdown, remark-gfm, rehype-highlight     |
 
