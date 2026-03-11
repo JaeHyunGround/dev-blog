@@ -12,25 +12,25 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Dev Blog",
-    template: "%s | Dev Blog",
+    default: "JaehyunGround",
+    template: "%s | JaehyunGround",
   },
-  description: "Next.js와 MDX로 작성하는 개인 기술 블로그",
+  description: "개발자 재현의 기술 블로그",
   keywords: ["Next.js", "React", "TypeScript", "MDX", "Blog"],
-  authors: [{ name: "Dev Blog" }],
-  creator: "Dev Blog",
+  authors: [{ name: "JaehyunGround" }],
+  creator: "JaehyunGround",
   openGraph: {
     type: "website",
     locale: "ko_KR",
     url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-    siteName: "Dev Blog",
-    title: "Dev Blog",
-    description: "Next.js와 MDX로 작성하는 개인 기술 블로그",
+    siteName: "JaehyunGround",
+    title: "JaehyunGround",
+    description: "개발자 재현의 기술 블로그",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Dev Blog",
-    description: "Next.js와 MDX로 작성하는 개인 기술 블로그",
+    title: "JaehyunGround",
+    description: "개발자 재현의 기술 블로그",
   },
   robots: {
     index: true,
