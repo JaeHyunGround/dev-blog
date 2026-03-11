@@ -9,6 +9,7 @@ import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypePrettyCode from "rehype-pretty-code";
 import { formatReadingTime } from "@/lib/utils/reading-time";
+import GiscusComments from "@/components/post/GiscusComments";
 
 export const revalidate = 3600; // 1시간마다 재생성
 
@@ -135,6 +136,9 @@ export default async function PostPage({ params }: PostPageProps) {
           }}
         />
       </div>
+
+      {/* Comments */}
+      <GiscusComments />
 
       {/* Footer Navigation */}
       <footer className="mt-12 pt-8 border-t border-border">
