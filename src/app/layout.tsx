@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     default: "JaehyunGround",
     template: "%s | JaehyunGround",
   },
-  description: "개발자 재현의 기술 블로그",
+  description: "Jaehyun's dev blog",
   keywords: ["Next.js", "React", "TypeScript", "MDX", "Blog"],
   authors: [{ name: "JaehyunGround" }],
   creator: "JaehyunGround",
@@ -25,12 +25,12 @@ export const metadata: Metadata = {
     url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     siteName: "JaehyunGround",
     title: "JaehyunGround",
-    description: "개발자 재현의 기술 블로그",
+    description: "Jaehyun's dev blog",
   },
   twitter: {
     card: "summary_large_image",
     title: "JaehyunGround",
-    description: "개발자 재현의 기술 블로그",
+    description: "Jaehyun's dev blog",
   },
   robots: {
     index: true,
