@@ -29,11 +29,6 @@ export default function GiscusComments() {
         <h2 className="text-lg font-semibold text-foreground">댓글</h2>
       </div>
 
-      {/* 안내 문구 */}
-      <p className="text-sm text-muted-foreground mb-6">
-        GitHub 계정으로 로그인하여 댓글을 남겨주세요.
-      </p>
-
       {/* Giscus 위젯 */}
       <Giscus
         id="comments"
