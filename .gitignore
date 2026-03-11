@@ -42,3 +42,7 @@ next-env.d.ts
 
 # auto-generated images (copied from content/posts)
 /public/images/posts
+
+# claude code / omc
+.claude/
+.omc/
