@@ -126,8 +126,12 @@ export default async function PostPage({ params }: PostPageProps) {
                 [
                   rehypePrettyCode,
                   {
-                    theme: "github-dark-dimmed",
-                    keepBackground: true,
+                    theme: {
+                      dark: "github-dark-dimmed",
+                      light: "github-light",
+                    },
+                    defaultColor: false,
+                    keepBackground: false,
                     defaultLang: "plaintext",
                   },
                 ],

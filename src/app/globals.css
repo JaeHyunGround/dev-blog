@@ -150,10 +150,9 @@ body {
   color: var(--foreground);
 }
 
-/* Code block styles with rehype-pretty-code */
+/* Code block styles with rehype-pretty-code (dual theme) */
 .prose pre {
   @apply overflow-x-auto rounded-lg p-4 my-6;
-  /* Don't override background - let rehype-pretty-code handle it */
 }
 
 .prose code {
@@ -163,6 +162,28 @@ body {
 .prose pre code {
   @apply bg-transparent p-0;
   display: grid;
+}
+
+/* Dual theme: use CSS variables from shiki */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+.dark code[data-theme*=" "],
+.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+/* Pre block background per theme */
+.prose pre {
+  background-color: #f6f8fa;
+}
+
+.dark .prose pre {
+  background-color: #22272e;
 }
 
 /* Inline code - not in pre blocks */
