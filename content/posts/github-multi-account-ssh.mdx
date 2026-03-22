@@ -1,0 +1,254 @@
+---
+title: "하나의 맥북에서 GitHub 회사 계정과 개인 계정 SSH로 분리하기"
+publishedAt: "2026-03-22"
+excerpt: "회사와 개인 프로젝트를 하나의 맥북에서 작업할 때 발생하는 커밋 계정 꼬임, 푸시 오류를 SSH 키 분리로 해결하는 방법을 정리합니다."
+tags: ["Git", "GitHub", "SSH", "DevOps"]
+---
+
+회사와 개인 프로젝트를 하나의 맥북에서 함께 작업하다 보면,
+**커밋 계정 꼬임**이나 **푸시 오류**, **퍼블릭/프라이빗 접근 이슈**가 자주 생긴다.
+
+이 글에서는 GitHub **회사 계정**과 **개인 계정**을 각각 SSH 키로 구분해서 사용하는 방법을 정리한다.
+
+---
+
+## .ssh 폴더가 없다면? 직접 만들어주기
+
+일부 환경에서는 `~/.ssh` 폴더가 기본적으로 없을 수도 있다.
+이 경우 SSH 키를 저장할 수 있도록 먼저 폴더를 만들어야 한다.
+
+```bash
+mkdir -p ~/.ssh
+```
+
+- `-p` 옵션은 이미 폴더가 존재해도 에러 없이 넘어가게 해줌
+- SSH 키는 항상 이 폴더 안에 저장됨
+
+## 1. SSH 키 각각 생성 (회사 / 개인)
+
+터미널에서 각각 아래 명령어를 입력하여 SSH 키를 생성한다.
+
+### 개인 계정 키 생성
+
+```bash
+ssh-keygen -t ed25519 -C "your_personal_email@example.com"
+```
+
+프롬프트가 뜨면 아래처럼 입력:
+
+```
+~/.ssh/id_ed25519_personal
+```
+
+엔터 2번 (패스프레이즈는 생략 가능)
+
+```
+|#*+ .o==+        |
+|== .  .=o        |
+| o.E .           |
+|. o   .. .       |
+|oo   .. S        |
+|o .  o.  o o     |
+|    o o.  *      |
+|   + +o.oo o     |
+|ooo.+o=+oo.      |
+```
+
+이런 이모지가 나오면 성공이다.
+
+### 회사 계정 키 생성
+
+```bash
+ssh-keygen -t ed25519 -C "your_work_email@company.com"
+```
+
+프롬프트가 뜨면 아래처럼 입력:
+
+```
+~/.ssh/id_ed25519_work
+```
+
+엔터 2번 (패스프레이즈는 생략 가능)
+
+```
+|#*+ .o==+        |
+|== .  .=o        |
+| o.E .           |
+|. o   .. .       |
+|oo   .. S        |
+|o .  o.  o o     |
+|    o o.  *      |
+|   + +o.oo o     |
+|ooo.+o=+oo.      |
+```
+
+이런 이모지가 나오면 성공이다.
+
+### 키 이름은 자유롭게 정해도 됨
+
+예시:
+
+```bash
+~/.ssh/id_github_personal
+~/.ssh/id_github_work
+```
+
+---
+
+## 2. SSH 키 확인
+
+```bash
+ls ~/.ssh
+```
+
+아래 4개가 보이면 OK:
+
+```
+id_ed25519_personal
+id_ed25519_personal.pub
+id_ed25519_work
+id_ed25519_work.pub
+```
+
+---
+
+## 3. GitHub에 공개 키 등록
+
+```bash
+# 개인 github
+cat ~/.ssh/id_ed25519_personal.pub
+```
+
+```bash
+# 회사 github
+cat ~/.ssh/id_ed25519_work.pub
+```
+
+명령어 입력 후 나오는 값을 복사하여
+**GitHub > Settings > SSH and GPG Keys**에서 각각의 계정에 등록한다.
+
+---
+
+## 4. SSH 설정 파일 수정 (~/.ssh/config)
+
+```bash
+nano ~/.ssh/config
+```
+
+아래 내용을 추가한다:
+
+```ssh
+# 개인 계정
+Host personal
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_personal
+  IdentitiesOnly yes
+
+# 회사 계정
+Host work
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_ed25519_work
+  IdentitiesOnly yes
+```
+
+### Host 이름도 자유롭게 지정 가능
+
+예: `gh-personal`, `gh-work`, `github-jaehyun`, `office`, `home` 등
+
+중요한 건 나중에 clone 또는 remote 설정 시 `git@<Host>:...` 형태로 쓸 거라는 점이다.
+
+---
+
+## 5. SSH 연결 테스트
+
+```bash
+ssh -T git@personal
+```
+
+```bash
+ssh -T git@work
+```
+
+결과:
+
+```
+Hi your-username! You've successfully authenticated, but GitHub does not provide shell access.
+```
+
+개인 or 회사 GitHub 계정의 이름이 나오면 성공이다.
+
+---
+
+## 6. 로컬에 이미 있는 프로젝트 설정
+
+레포 클론 시, SSH 탭을 눌렀을 때 나오는 URL을 복사한 뒤
+
+```
+git@github.com:~~/~~.git
+```
+
+을 아래처럼 바꿔준다고 생각하면 된다. (회사 프로젝트라면 `personal` 대신 `work`가 들어가야 한다.)
+
+```
+git@personal:~~/~~.git
+```
+
+### 개인 프로젝트
+
+```bash
+git remote set-url origin git@personal:username/repo.git
+git config user.name "your user name"
+git config user.email "your_personal_email@example.com"
+```
+
+### 회사 프로젝트
+
+```bash
+git remote set-url origin git@work:orgname/repo.git
+git config user.name "Jaehyun Ahn"
+git config user.email "your_work_email@company.com"
+```
+
+---
+
+## 7. 새로 clone 해올 때
+
+### 개인 계정에서 clone
+
+```bash
+git clone git@personal:username/repo.git
+cd repo
+git config user.name "your name"
+git config user.email "your_personal_email@example.com"
+```
+
+### 회사 계정에서 clone
+
+```bash
+git clone git@work:orgname/repo.git
+cd repo
+git config user.name "your name"
+git config user.email "your_work_email@company.com"
+```
+
+---
+
+## 마무리 체크리스트
+
+| 항목 | 개인용 | 회사용 |
+|---|---|---|
+| SSH 키 | `id_ed25519_personal` | `id_ed25519_work` |
+| 공개 키 등록 | 개인 GitHub 계정 | 회사 GitHub 계정 |
+| `~/.ssh/config` 설정 | `Host personal` | `Host work` |
+| clone 주소 | `git@personal:username/...` | `git@work:orgname/...` |
+| 커밋 사용자 | 개인 이메일 & 이름 | 회사 이메일 & 이름 |
+
+---
+
+## 참고
+
+- `git remote -v` 로 현재 remote 주소 확인 가능
+- 커밋 계정 확인: `git config user.name`, `git config user.email`
+- 전역 설정은 `~/.gitconfig`, 레포별 설정은 `.git/config`에 저장됨
